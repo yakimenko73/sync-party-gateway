@@ -1,12 +1,21 @@
 defmodule WebsocketGateway do
+  use Application
+  require Logger
+
   def start(_type, _args) do
+    port = Application.get_env(:websocket_gateway, :port, 4000)
+    timeout = Application.get_env(:websocket_gateway, :timeout, 60000)
+    ws_endpoint = Application.get_env(:websocket_gateway, :ws_endpoint, "ws")
+
+    Logger.debug("Config: #{port}, #{timeout}, #{ws_endpoint}")
+
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: WebsocketGateway.Router,
         options: [
-          dispatch: dispatch(),
-          port: 4000
+          dispatch: dispatch(ws_endpoint, timeout),
+          port: port
         ]
       ),
       Registry.child_spec(
@@ -19,11 +28,14 @@ defmodule WebsocketGateway do
     Supervisor.start_link(children, opts)
   end
 
-  defp dispatch do
+  defp dispatch(endpoint, timeout) do
     [
-      {:_,
+      {
+        :_,
         [
-          {"/ws/[...]", WebsocketGateway.SocketHandler, []},
+          {"/#{endpoint}/[...]", WebsocketGateway.SocketHandler, [
+            timeout: timeout
+          ]},
           {:_, Plug.Cowboy.Handler, {WebsocketGateway.Router, []}}
         ]
       }
