@@ -4,6 +4,7 @@ defmodule WebsocketGateway.SocketHandler do
   alias Registry.WebsocketGateway, as: Websocket
 
   def init(request, _state) do
+    Logger.debug(request)
     state = %{registry_key: request.path}
 
     {:cowboy_websocket, request, state}
@@ -21,7 +22,6 @@ defmodule WebsocketGateway.SocketHandler do
     handle(payload["data"], state)
   end
 
-  @spec websocket_info(any, any) :: {:reply, {:text, any}, any}
   def websocket_info(info, state) do
     {:reply, {:text, info}, state}
   end
@@ -29,6 +29,7 @@ defmodule WebsocketGateway.SocketHandler do
   defp handle(%{"message" => _} = message, state) do
     Logger.debug("WS: Receive user message: #{inspect(message)}")
     message = Jason.encode!(message)
+
     Websocket
     |> Registry.dispatch(
       state.registry_key,
@@ -47,6 +48,8 @@ defmodule WebsocketGateway.SocketHandler do
   defp handle(%{"command" => _} = command, state) do
     Logger.debug("WS: Receive command: #{inspect(command)}")
 
-    {:reply, {:text, Jason.encode!(command)}, state}
+    Logger.debug(state)
+
+    {:ok, state}
   end
 end
