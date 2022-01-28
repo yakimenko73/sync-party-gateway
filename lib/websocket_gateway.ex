@@ -33,9 +33,10 @@ defmodule WebsocketGateway do
       {
         :_,
         [
-          {"/#{endpoint}/[...]", WebsocketGateway.SocketHandler, [
-            timeout: timeout
-          ]},
+          {"/#{endpoint}/[...]", WebsocketGateway.SocketHandler,
+           [
+             timeout: timeout
+           ]},
           {:_, Plug.Cowboy.Handler, {WebsocketGateway.Router, []}}
         ]
       }
