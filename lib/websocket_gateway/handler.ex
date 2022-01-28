@@ -1,9 +1,11 @@
 defmodule WebsocketGateway.SocketHandler do
   @behaviour :cowboy_websocket
   require Logger
+  require WebsocketGateway.SocketHandler.CommandHandler
   require WebsocketGateway.Broker
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Broker, as: Broker
+  alias WebsocketGateway.SocketHandler.CommandHandler, as: CommandHandler
 
   def init(request, _state) do
     state = %{registry_key: request.path}
@@ -25,6 +27,7 @@ defmodule WebsocketGateway.SocketHandler do
 
   def websocket_handle(_frame, _req, state) do
     Logger.debug("WS: Found unhandled message #{inspect(state)}")
+
     {:ok, state}
   end
 
@@ -34,9 +37,7 @@ defmodule WebsocketGateway.SocketHandler do
 
   def terminate(_reason, _req, state) do
     Logger.debug("WS: Terminate connection. State: #{inspect(state)}")
-
-    message = Jason.encode!(%{message: %{text: "John Doe left the room"}})
-    Broker.send(message, state)
+    CommandHandler.handle(%{text: "Left"}, state) #FIXME
 
     :ok
   end
@@ -44,7 +45,6 @@ defmodule WebsocketGateway.SocketHandler do
   defp handle(%{"message" => _message} = message, state) do
     Logger.debug("WS: Receive chat message: #{inspect(message)}. State: #{inspect(state)}")
     message = Jason.encode!(message)
-
     Broker.send(message, state)
 
     {:reply, {:text, message}, state}
@@ -52,17 +52,6 @@ defmodule WebsocketGateway.SocketHandler do
 
   defp handle(%{"command" => command}, state) do
     Logger.debug("WS: Receive command: #{inspect(command)}. State: #{inspect(state)}")
-
-    case command do
-      %{"text" => "Join"} ->
-        message = Jason.encode!(%{message: %{text: "John Doe joined to the room"}})
-        Broker.send(message, state)
-
-        {:reply, {:text, message}, state}
-
-      _ ->
-        Logger.debug("WS: Found unhandled command")
-        {:ok, state}
-    end
+    CommandHandler.handle(command, state)
   end
 end
