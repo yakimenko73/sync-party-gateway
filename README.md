@@ -18,10 +18,14 @@ This tutorial will help you run server locally
 Requires Elixir >= 1.13
 
 1. Clone the repo
-   ```sh
-   git clone https://github.com/yakimenko73/sync-party-gateway.git
-   ```
-2. Run in dev mode with
+  ```sh
+  git clone https://github.com/yakimenko73/sync-party-gateway.git
+  ```
+2. Get project deps
+  ```sh
+  mix deps.get
+  ```
+3. Run in dev mode with
   ```sh
   iex -S mix
   ````
