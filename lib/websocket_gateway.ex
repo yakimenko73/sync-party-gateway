@@ -3,6 +3,7 @@ defmodule WebsocketGateway do
   require Logger
 
   def start(_type, _args) do
+    ip = Application.get_env(:websocket_gateway, :ip, {127, 0, 0, 1})
     port = Application.get_env(:websocket_gateway, :port, 4000)
     timeout = Application.get_env(:websocket_gateway, :timeout, 60000)
     ws_endpoint = Application.get_env(:websocket_gateway, :ws_endpoint, "ws")
@@ -15,7 +16,8 @@ defmodule WebsocketGateway do
         plug: WebsocketGateway.Router,
         options: [
           dispatch: dispatch(ws_endpoint, timeout),
-          port: port
+          port: port,
+          ip: ip
         ]
       ),
       Registry.child_spec(
