@@ -7,6 +7,11 @@ defmodule WebsocketGateway.SocketHandler do
   alias WebsocketGateway.Broker, as: Broker
   alias WebsocketGateway.SocketHandler.CommandHandler, as: CommandHandler
 
+  @raw_user_data %{
+    "nickname" => "John Doe",
+    "color" => "red"
+  }
+
   def init(request, _state) do
     state = %{registry_key: request.path}
 
@@ -16,6 +21,8 @@ defmodule WebsocketGateway.SocketHandler do
   def websocket_init(state) do
     Websocket
     |> Registry.register(state.registry_key, {})
+
+    state = Map.put(state, :user, @raw_user_data)
 
     {:ok, state}
   end
@@ -42,9 +49,9 @@ defmodule WebsocketGateway.SocketHandler do
     :ok
   end
 
-  defp handle(%{"message" => _message} = message, state) do
+  defp handle(%{"message" => message}, state) do
     Logger.debug("WS: Receive chat message: #{inspect(message)}. State: #{inspect(state)}")
-    message = Jason.encode!(message)
+    message = Jason.encode!(%{message: Map.merge(message, state[:user])})
     Broker.send(message, state)
 
     {:reply, {:text, message}, state}
