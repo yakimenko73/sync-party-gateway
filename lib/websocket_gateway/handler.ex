@@ -37,7 +37,7 @@ defmodule WebsocketGateway.SocketHandler do
 
   def terminate(_reason, _req, state) do
     Logger.debug("WS: Terminate connection. State: #{inspect(state)}")
-    CommandHandler.handle(%{text: "Left"}, state) #FIXME
+    CommandHandler.handle(%{"text" => "Left"}, state)
 
     :ok
   end
