@@ -15,7 +15,7 @@ defmodule WebsocketGateway.MixProject do
   def application do
     [
       mod: {WebsocketGateway, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :mongodb]
     ]
   end
 
@@ -25,7 +25,8 @@ defmodule WebsocketGateway.MixProject do
       {:cowboy, "~> 2.4"},
       {:plug, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:mongodb, "~> 0.5.1"}
     ]
   end
 end

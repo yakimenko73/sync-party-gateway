@@ -1,5 +1,7 @@
 defmodule WebsocketGateway.Supervisor do
   def init() do
+    import Supervisor.Spec
+
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
@@ -13,10 +15,11 @@ defmodule WebsocketGateway.Supervisor do
       Registry.child_spec(
         keys: :duplicate,
         name: Registry.WebsocketGateway
-      )
+      ),
+      worker(Mongo, [[name: :mongo, database: database(), pool_size: 3]])
     ]
 
-    opts = [strategy: :one_for_one, name: WebsocketGateway.Application]
+    opts = [strategy: :one_for_one, name: WebsocketGateway.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -42,4 +45,6 @@ defmodule WebsocketGateway.Supervisor do
   defp endpoint, do: Application.get_env(:websocket_gateway, :ws_endpoint, "ws")
 
   defp timeout, do: Application.get_env(:websocket_gateway, :timeout, 60000)
+
+  defp database, do: Application.get_env(:websocket_gateway, :database, "sync-party")
 end
