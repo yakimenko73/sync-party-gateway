@@ -1,11 +1,10 @@
 defmodule WebsocketGateway.SocketHandler do
   @behaviour :cowboy_websocket
   require Logger
-  require WebsocketGateway.SocketHandler.CommandHandler
-  require WebsocketGateway.Broker
   alias Registry.WebsocketGateway, as: Websocket
-  alias WebsocketGateway.Broker, as: Broker
-  alias WebsocketGateway.SocketHandler.CommandHandler, as: CommandHandler
+  alias WebsocketGateway.Broker
+  alias WebsocketGateway.SocketHandler.CommandHandler
+  alias MongoDb.Service
 
   @raw_user_data %{
     "nickname" => "John Doe",
@@ -28,6 +27,7 @@ defmodule WebsocketGateway.SocketHandler do
   end
 
   def websocket_handle({:text, json}, state) do
+    Logger.debug(inspect(Service.get_all_rooms()))
     payload = Jason.decode!(json)
     handle(payload["data"], state)
   end
