@@ -3,15 +3,13 @@
 Elixir websocket gateway for real-time Sync-party site operation
 
 ### Built With
-
-* [Elixir](https://www.djangoproject.com/)
 * [Plug](https://hexdocs.pm/plug/readme.html)
 * [Plug-cowboy](https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html)
 * [Jason](https://hexdocs.pm/jason/readme.html)
+* [HTTPoison](https://hexdocs.pm/httpoison/HTTPoison.html)
 * [Mongodb](https://www.mongodb.com/)
 
 ## Getting Started
-
 This tutorial will help you run server locally
 
 ### Installation

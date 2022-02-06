@@ -26,9 +26,8 @@ defmodule WebsocketGateway.MixProject do
       {:plug, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},
       {:jason, "~> 1.1"},
-      # {:mongodb, "~> 0.5.1"},
-      {:plug_crypto, "~> 1.2.2"},
       {:mongodb, github: "elixir-mongo/mongodb"},
+      {:httpoison, "~> 1.8"},
     ]
   end
 end
