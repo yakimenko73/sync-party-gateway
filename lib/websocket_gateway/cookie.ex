@@ -1,23 +1,20 @@
 defmodule WebsocketGateway.Cookie do
   alias Plug.Conn.Cookies
-  require Logger
 
   def get_session_id(request) do
-    cookie = decode(request)
-
-    case cookie do
-      %{"sessionid" => value} -> {:ok, value}
-      _ -> {:error, "Cookie: Session id not found"}
-    end
+    request.headers["cookie"]
+    |> decode
+    |> (fn
+          {:ok, %{"sessionid" => value}} -> {:ok, value}
+          _ -> {:error, "Cookie: Session id not found"}
+        end).()
   end
 
-  defp decode(request) do
-    cookie = request.headers["cookie"]
+  defp decode(cookie) when is_nil(cookie) do
+    {:ok, %{}}
+  end
 
-    if is_nil(cookie) do
-      %{}
-    else
-      Cookies.decode(cookie)
-    end
+  defp decode(cookie) do
+    {:ok, Cookies.decode(cookie)}
   end
 end

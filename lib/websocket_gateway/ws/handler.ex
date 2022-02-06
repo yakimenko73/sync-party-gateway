@@ -1,25 +1,25 @@
-defmodule WebsocketGateway.SocketHandler do
+defmodule WebsocketGateway.SocketHandler.Handler do
   @behaviour :cowboy_websocket
   require Logger
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Broker
   alias WebsocketGateway.SocketHandler.CommandHandler
-  alias MongoDb.Service
   alias WebsocketGateway.Cookie
+  alias WebsocketGateway.Http.Client, as: HttpClient
 
-  @raw_user_data %{
-    "nickname" => "John Doe",
-    "color" => "red"
-  }
+  @default_user_nickname "John Doe"
+  @sessions_api "http://127.0.0.1:8000/api/sessions"
 
   def init(request, _state) do
     state = %{registry_key: request.path}
     session_id = Cookie.get_session_id(request)
 
     case session_id do
-      {:ok, id} -> id
+      {:ok, id} -> HttpClient.get("#{@sessions_api}/#{id}/")
       {:error, disc} -> Logger.warning(disc)
     end
+
+    state = Map.put(state, :user, %{nickname: @default_user_nickname})
 
     {:cowboy_websocket, request, state}
   end
@@ -27,8 +27,6 @@ defmodule WebsocketGateway.SocketHandler do
   def websocket_init(state) do
     Websocket
     |> Registry.register(state.registry_key, {})
-
-    state = Map.put(state, :user, @raw_user_data)
 
     {:ok, state}
   end
@@ -57,7 +55,7 @@ defmodule WebsocketGateway.SocketHandler do
 
   defp handle(%{"message" => message}, state) do
     Logger.debug("WS: Receive chat message: #{inspect(message)}. State: #{inspect(state)}")
-    message = Jason.encode!(%{message: Map.merge(message, state[:user])})
+    message = %{message: Map.merge(message, state[:user])} |> Jason.encode()
     Broker.send(message, state)
 
     {:reply, {:text, message}, state}
