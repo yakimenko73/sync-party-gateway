@@ -5,6 +5,7 @@ defmodule WebsocketGateway.SocketHandler do
   alias WebsocketGateway.Broker
   alias WebsocketGateway.SocketHandler.CommandHandler
   alias MongoDb.Service
+  alias WebsocketGateway.Cookie
 
   @raw_user_data %{
     "nickname" => "John Doe",
@@ -13,6 +14,12 @@ defmodule WebsocketGateway.SocketHandler do
 
   def init(request, _state) do
     state = %{registry_key: request.path}
+    session_id = Cookie.get_session_id(request)
+
+    case session_id do
+      {:ok, id} -> id
+      {:error, disc} -> Logger.warning(disc)
+    end
 
     {:cowboy_websocket, request, state}
   end
@@ -27,7 +34,6 @@ defmodule WebsocketGateway.SocketHandler do
   end
 
   def websocket_handle({:text, json}, state) do
-    Logger.debug(inspect(Service.get_all_rooms()))
     payload = Jason.decode!(json)
     handle(payload["data"], state)
   end
