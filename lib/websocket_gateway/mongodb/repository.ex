@@ -1,4 +1,4 @@
-defmodule MongoDb.Repository do
+defmodule WebsocketGateway.MongoDb.Repository do
   @collection "rooms_room"
 
   def list() do

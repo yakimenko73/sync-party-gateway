@@ -11,7 +11,7 @@ defmodule WebsocketGateway.Cookie do
   end
 
   defp decode(cookie) when is_nil(cookie) do
-    {:ok, %{}}
+    {:ok, :empty}
   end
 
   defp decode(cookie) do
