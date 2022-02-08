@@ -1,13 +1,12 @@
-defmodule WebsocketGateway.SocketHandler.Handler do
+defmodule WebsocketGateway.Handler.Handler do
   @behaviour :cowboy_websocket
   require Logger
   alias Registry.WebsocketGateway, as: Websocket
-  alias WebsocketGateway.Broker
-  alias WebsocketGateway.SocketHandler.CommandHandler
+  alias WebsocketGateway.Handler.CommandHandler
+  alias WebsocketGateway.Handler.MessageHandler
   alias WebsocketGateway.Cookie
   alias WebsocketGateway.Http.Client, as: HttpClient
 
-  @default_user_nickname "John Doe"
   @sessions_api "http://127.0.0.1:8000/api/sessions"
 
   def init(request, _state) do
@@ -19,7 +18,7 @@ defmodule WebsocketGateway.SocketHandler.Handler do
       {:error, disc} -> Logger.warning(disc)
     end
 
-    state = Map.put(state, :user, %{nickname: @default_user_nickname})
+    state = Map.put(state, :user, %{nickname: "John Doe"})
 
     {:cowboy_websocket, request, state}
   end
@@ -33,13 +32,7 @@ defmodule WebsocketGateway.SocketHandler.Handler do
 
   def websocket_handle({:text, json}, state) do
     payload = Jason.decode!(json)
-    handle(payload["data"], state)
-  end
-
-  def websocket_handle(_frame, _req, state) do
-    Logger.debug("WS: Found unhandled message #{inspect(state)}")
-
-    {:ok, state}
+    payload["data"] |> handle(state)
   end
 
   def websocket_info(info, state) do
@@ -49,16 +42,11 @@ defmodule WebsocketGateway.SocketHandler.Handler do
   def terminate(_reason, _req, state) do
     Logger.debug("WS: Terminate connection. State: #{inspect(state)}")
     CommandHandler.handle(%{"text" => "Left"}, state)
-
-    :ok
   end
 
   defp handle(%{"message" => message}, state) do
     Logger.debug("WS: Receive chat message: #{inspect(message)}. State: #{inspect(state)}")
-    message = %{message: Map.merge(message, state[:user])} |> Jason.encode()
-    Broker.send(message, state)
-
-    {:reply, {:text, message}, state}
+    MessageHandler.handle(message, state)
   end
 
   defp handle(%{"command" => command}, state) do

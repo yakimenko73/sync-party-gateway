@@ -42,7 +42,7 @@ defmodule WebsocketGateway.Supervisor do
       {
         :_,
         [
-          {"/#{endpoint()}/[...]", WebsocketGateway.SocketHandler.Handler,
+          {"/#{endpoint()}/[...]", WebsocketGateway.Handler.Handler,
            [
              timeout: timeout()
            ]},
