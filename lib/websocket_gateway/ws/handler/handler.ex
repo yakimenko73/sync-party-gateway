@@ -4,7 +4,7 @@ defmodule WebsocketGateway.Handler.Handler do
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Handler.CommandHandler
   alias WebsocketGateway.Handler.MessageHandler
-  alias WebsocketGateway.Cookie
+  alias WebsocketGateway.Http.Cookie
   alias WebsocketGateway.Http.Client, as: HttpClient
 
   @sessions_api "http://127.0.0.1:8000/api/sessions"

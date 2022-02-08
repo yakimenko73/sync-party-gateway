@@ -1,4 +1,4 @@
-defmodule WebsocketGateway.Cookie do
+defmodule WebsocketGateway.Http.Cookie do
   alias Plug.Conn.Cookies
 
   def get_session_id(request) do
