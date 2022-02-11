@@ -4,21 +4,11 @@ defmodule WebsocketGateway.Handler.Handler do
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Handler.CommandHandler
   alias WebsocketGateway.Handler.MessageHandler
-  alias WebsocketGateway.Http.Cookie
-  alias WebsocketGateway.Http.Client, as: HttpClient
-
-  @sessions_api "http://127.0.0.1:8000/api/sessions"
+  alias WebsocketGateway.Service.SyncPartyService
 
   def init(request, _state) do
-    state = %{registry_key: request.path}
-    session_id = Cookie.get_session_id(request)
-
-    case session_id do
-      {:ok, id} -> HttpClient.get("#{@sessions_api}/#{id}/")
-      {:error, disc} -> Logger.warning(disc)
-    end
-
-    state = Map.put(state, :user, %{nickname: "John Doe"})
+    session_info = SyncPartyService.get_session_info(request)
+    state = %{registry_key: request.path, user: session_info}
 
     {:cowboy_websocket, request, state}
   end
