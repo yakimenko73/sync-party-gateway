@@ -4,7 +4,7 @@ defmodule WebsocketGateway.Handler.Handler do
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Handler.CommandHandler
   alias WebsocketGateway.Handler.MessageHandler
-  alias WebsocketGateway.Service.SyncPartyService
+  alias WebsocketGateway.SyncParty.Service, as: SyncPartyService
 
   def init(request, _state) do
     session_info = SyncPartyService.get_session_info(request)

@@ -1,4 +1,4 @@
-defmodule WebsocketGateway.Service.SyncPartyService do
+defmodule WebsocketGateway.SyncParty.Service do
   alias WebsocketGateway.Http.Cookie
   alias WebsocketGateway.Http.Client, as: HttpClient
   alias WebsocketGateway.Utils
