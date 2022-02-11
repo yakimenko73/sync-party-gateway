@@ -8,7 +8,12 @@ defmodule WebsocketGateway.Handler.Handler do
 
   def init(request, _state) do
     session_info = SyncPartyService.get_session_info(request)
-    state = %{registry_key: request.path, user: session_info}
+
+    state = %{
+      registry_key: request.path,
+      user: session_info,
+      chat_id: List.last(String.split(request.path, "/"))
+    }
 
     {:cowboy_websocket, request, state}
   end
