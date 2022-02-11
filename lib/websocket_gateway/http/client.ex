@@ -11,7 +11,7 @@ defmodule WebsocketGateway.Http.Client do
   end
 
   defp handle({:ok, %HTTPoison.Response{status_code: 404}}) do
-    {:ok, "Http: Not found"}
+    {:error, "Http: Not found"}
   end
 
   defp handle({:error, %HTTPoison.Error{reason: reason}}) do

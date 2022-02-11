@@ -1,12 +1,12 @@
 defmodule WebsocketGateway.Http.Cookie do
   alias Plug.Conn.Cookies
 
-  def get_session_id(request) do
-    request.headers["cookie"]
+  def get_by_name(cookie, name) do
+    cookie
     |> decode
     |> (fn
-          {:ok, %{"sessionid" => value}} -> {:ok, value}
-          _ -> {:error, "Cookie: Session id not found"}
+          {:ok, %{^name => value}} -> {:ok, value}
+          _ -> :notfound
         end).()
   end
 
