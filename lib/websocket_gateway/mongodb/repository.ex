@@ -1,9 +1,9 @@
 defmodule WebsocketGateway.MongoDb.Repository do
-  def list(chat_id) do
-    :mongo |> Mongo.find(chat_id, %{})
+  def list(collection) do
+    :mongo |> Mongo.find(collection, %{})
   end
 
-  def add(chat_id, text, author, color) do
-    :mongo |> Mongo.insert_one(chat_id, %{text: text, author: author, color: color})
+  def add(collection, body) do
+    :mongo |> Mongo.insert_one(collection, body)
   end
 end

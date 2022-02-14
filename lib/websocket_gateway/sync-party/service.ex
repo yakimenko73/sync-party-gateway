@@ -5,7 +5,7 @@ defmodule WebsocketGateway.SyncParty.Service do
   require Logger
 
   @sessions_api "http://127.0.0.1:8000/api/sessions"
-  @default_session_data %{nickname: "John Doe"}
+  @default_session_data %{nickname: "John Doe", color: "red"}
   @session_id_cookie_name "sessionid"
   @default_data_log_pattern "Use default session data: #{inspect(@default_session_data)}"
 

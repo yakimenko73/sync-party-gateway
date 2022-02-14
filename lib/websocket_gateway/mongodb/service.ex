@@ -9,7 +9,8 @@ defmodule WebsocketGateway.MongoDb.Service do
   end
 
   def save_message(chat_id, text, user) do
-    messages = Repository.add("chat_#{chat_id}", text, user.nickname, user.color)
+    messages =
+      Repository.add("chat_#{chat_id}", %{text: text, author: user.nickname, color: user.color})
 
     {:ok, messages}
   end
