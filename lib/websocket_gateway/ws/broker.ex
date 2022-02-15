@@ -14,4 +14,8 @@ defmodule WebsocketGateway.Broker do
       end
     )
   end
+
+  def self_only_send(message) do
+    Process.send(self(), message, [])
+  end
 end
