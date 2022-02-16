@@ -45,7 +45,7 @@ defmodule WebsocketGateway.SyncParty.Service do
   end
 
   defp handle({:error, message}, session_id) do
-    Logger.warning("Session: #{session_id} | #{message} | #{@default_data_log_pattern}")
+    Logger.warning("#{message} | Session: #{session_id} | #{@default_data_log_pattern}")
 
     @default_session_data
   end

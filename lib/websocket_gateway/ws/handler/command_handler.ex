@@ -7,7 +7,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
 
   @join_room_command_pattern "nickname joined to the room"
   @left_room_command_pattern "nickname left the room"
-  @initial_message_sending_limit 10
+  @initial_message_sending_limit 50
 
   def handle(%{"text" => "Join"}, state) do
     join_message =
@@ -38,7 +38,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   defp send_chat_messages(state) do
-    {_, messages} = Storage.get_messages(state.chat_id, @initial_message_sending_limit)
+    {_, messages} = Storage.get_last_messages(state.chat_id, @initial_message_sending_limit)
 
     for message <- messages do
       MessageConstructor.construct(message["text"], %{
