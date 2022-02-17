@@ -1,5 +1,5 @@
 defmodule WebsocketGateway.Constructor.MessageConstructor do
-  @behaviour WebsocketGateway.Constructor.Constructor
+  @behaviour WebsocketGateway.Constructor.ConstructorBehavior
 
   def construct(text) do
     %{data: %{message: %{text: text}}}
