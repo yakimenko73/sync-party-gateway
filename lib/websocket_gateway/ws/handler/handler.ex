@@ -12,7 +12,7 @@ defmodule WebsocketGateway.Handler.Handler do
     state = %{
       registry_key: request.path,
       user: session_info,
-      chat_id: List.last(String.split(request.path, "/"))
+      chat_id: retrieve_chat_id(request)
     }
 
     {:cowboy_websocket, request, state}
@@ -47,5 +47,11 @@ defmodule WebsocketGateway.Handler.Handler do
   defp handle(%{"command" => command}, state) do
     Logger.debug("WS: Receive command: #{inspect(command)}. State: #{inspect(state)}")
     CommandHandler.handle(command, state)
+  end
+
+  defp retrieve_chat_id(request) do
+    request.path
+    |> String.split("/")
+    |> List.last()
   end
 end

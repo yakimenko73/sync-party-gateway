@@ -12,7 +12,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   def handle(%{"text" => "Join"}, state) do
     join_message =
       @join_room_command_pattern
-      |> String.replace("nickname", state.user.nickname, global: false)
+      |> get_message_by_pattern(state.user.nickname)
       |> CommandConstructor.construct()
       |> Jason.encode!()
 
@@ -25,7 +25,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
 
   def handle(%{"text" => "Left"}, state) do
     @left_room_command_pattern
-    |> String.replace("nickname", state.user.nickname, global: false)
+    |> get_message_by_pattern(state.user.nickname)
     |> CommandConstructor.construct()
     |> Jason.encode!()
     |> Broker.send(state)
@@ -48,5 +48,9 @@ defmodule WebsocketGateway.Handler.CommandHandler do
       |> Jason.encode!()
       |> Broker.self_only_send()
     end
+  end
+
+  defp get_message_by_pattern(pattern, nickname) do
+    pattern |> String.replace("nickname", nickname, global: false)
   end
 end
