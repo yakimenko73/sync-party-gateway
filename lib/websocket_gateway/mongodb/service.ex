@@ -1,9 +1,12 @@
 defmodule WebsocketGateway.MongoDb.Service do
   alias WebsocketGateway.MongoDb.Repository
 
+  @collection_chat_messages "chatmessages"
+
   def get_last_messages(chat_id, limit) do
     messages =
-      Repository.list("chat_#{chat_id}", limit, %{date: -1})
+      @collection_chat_messages
+      |> Repository.list(%{chat_id: chat_id}, limit, %{date: -1})
       |> Enum.to_list()
       |> Enum.reverse()
 
@@ -11,7 +14,9 @@ defmodule WebsocketGateway.MongoDb.Service do
   end
 
   def save_message(chat_id, text, user) do
-    Repository.add("chat_#{chat_id}", %{
+    @collection_chat_messages
+    |> Repository.add(%{
+      chat_id: chat_id,
       text: text,
       author: user.nickname,
       color: user.color,
