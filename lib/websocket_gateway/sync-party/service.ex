@@ -26,14 +26,14 @@ defmodule WebsocketGateway.SyncParty.Service do
   end
 
   def get_session_info(%{headers: headers}) do
-    Logger.warning("Session: Cookie header not found | #{headers} | #{@default_data_log_pattern}")
+    Logger.warning("Session: Cookie header not found | #{inspect(headers)} | #{@default_data_log_pattern}")
 
     @default_session_data
   end
 
   def get_session_info(request) do
     Logger.warning(
-      "Session: Unexpected request from Websocket | #{request} | #{@default_data_log_pattern}"
+      "Session: Unexpected request from Websocket | #{inspect(request)} | #{@default_data_log_pattern}"
     )
 
     @default_session_data
