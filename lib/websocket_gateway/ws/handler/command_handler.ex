@@ -10,8 +10,8 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   @initial_message_sending_limit 50
 
   def handle(%{"text" => "Join"}, state) do
-    send_chat_messages(state)
     Storage.add_room_member(state.room_key, state.user)
+    send_chat_messages(state)
 
     join_message =
       @join_room_command_pattern
@@ -25,6 +25,8 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   def handle(%{"text" => "Left"}, state) do
+    Storage.remove_room_member(state.room_key, state.user)
+
     @left_room_command_pattern
     |> get_message_by_pattern(state.user.nickname)
     |> CommandConstructor.construct()

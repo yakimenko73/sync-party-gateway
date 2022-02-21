@@ -35,13 +35,24 @@ defmodule WebsocketGateway.MongoDb.Service do
     }
 
     @collection_room_members
-    |> Repository.update_one(
+    |> Repository.update(
       body,
       %{
         "$set" => Map.put(body, :date, DateTime.utc_now())
       },
       true
     )
+
+    :ok
+  end
+
+  def remove_room_member(room_id, member) do
+    @collection_room_members
+    |> Repository.delete(%{
+      room_id: room_id,
+      nickname: member.nickname,
+      color: member.color
+    })
 
     :ok
   end

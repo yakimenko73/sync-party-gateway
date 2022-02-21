@@ -8,7 +8,11 @@ defmodule WebsocketGateway.MongoDb.Repository do
     :mongo |> Mongo.insert_one(collection, body)
   end
 
-  def update_one(collection, filter, body, upsert) do
+  def update(collection, filter, body, upsert) do
     :mongo |> Mongo.update_one(collection, filter, body, upsert: upsert)
+  end
+
+  def delete(collection, filter) do
+    :mongo |> Mongo.delete_one(collection, filter)
   end
 end
