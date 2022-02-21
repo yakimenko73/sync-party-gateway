@@ -10,6 +10,9 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   @initial_message_sending_limit 50
 
   def handle(%{"text" => "Join"}, state) do
+    send_chat_messages(state)
+    Storage.add_room_member(state.room_key, state.user)
+
     join_message =
       @join_room_command_pattern
       |> get_message_by_pattern(state.user.nickname)
@@ -17,8 +20,6 @@ defmodule WebsocketGateway.Handler.CommandHandler do
       |> Jason.encode!()
 
     Broker.send(join_message, state)
-
-    send_chat_messages(state)
 
     {:reply, {:text, join_message}, state}
   end
@@ -38,7 +39,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   defp send_chat_messages(state) do
-    {_, messages} = Storage.get_last_messages(state.chat_id, @initial_message_sending_limit)
+    {_, messages} = Storage.get_last_messages(state.room_key, @initial_message_sending_limit)
 
     for message <- messages do
       MessageConstructor.construct(message["text"], %{

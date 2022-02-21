@@ -5,7 +5,7 @@ defmodule WebsocketGateway.Handler.MessageHandler do
   alias WebsocketGateway.MongoDb.Service, as: Storage
 
   def handle(%{"text" => text}, state) do
-    Storage.save_message(state.chat_id, text, state.user)
+    Storage.save_message(state.room_key, text, state.user)
 
     message =
       MessageConstructor.construct(text, state.user)
