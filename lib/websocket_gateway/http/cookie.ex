@@ -4,10 +4,10 @@ defmodule WebsocketGateway.Http.Cookie do
   def get_by_name(cookie, name) do
     cookie
     |> decode
-    |> (fn
-          {:ok, %{^name => value}} -> {:ok, value}
-          _ -> :notfound
-        end).()
+    |> case do
+      {:ok, %{^name => value}} -> {:ok, value}
+      _ -> :notfound
+    end
   end
 
   defp decode(cookie) when is_nil(cookie) do
