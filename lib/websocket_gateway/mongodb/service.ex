@@ -1,5 +1,7 @@
 defmodule WebsocketGateway.MongoDb.Service do
   alias WebsocketGateway.MongoDb.Repository
+  alias WebsocketGateway.Utils
+  require Logger
 
   @collection_chat_messages "chatmessages"
   @collection_room_members "roommembers"
@@ -28,31 +30,24 @@ defmodule WebsocketGateway.MongoDb.Service do
   end
 
   def add_room_member(room_id, member) do
-    body = %{
-      room_id: room_id,
-      nickname: member.nickname,
-      color: member.color
-    }
+    body = member |> Map.put(:room_id, room_id)
 
-    @collection_room_members
-    |> Repository.update(
-      body,
-      %{
-        "$set" => Map.put(body, :date, DateTime.utc_now())
-      },
-      true
-    )
+    {:ok, res} =
+      @collection_room_members
+      |> Repository.find_one_and_update(
+        body,
+        %{
+          "$set" => Map.put(body, :date, DateTime.utc_now())
+        },
+        true
+      )
 
-    :ok
+    {:ok, res.value["_id"] |> Utils.get_value_from_bson()}
   end
 
   def remove_room_member(room_id, member) do
     @collection_room_members
-    |> Repository.delete(%{
-      room_id: room_id,
-      nickname: member.nickname,
-      color: member.color
-    })
+    |> Repository.delete(member |> Map.put(:room_id, room_id))
 
     :ok
   end
