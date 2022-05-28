@@ -27,7 +27,7 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   def handle(%{"text" => "Left" = cmd}, state) do
-    Storage.remove_room_member(state.room_key, state.user)
+    Storage.remove_room_member(state.user.id)
 
     @left_room_command_pattern
     |> get_message_by_pattern(state.user.nickname)

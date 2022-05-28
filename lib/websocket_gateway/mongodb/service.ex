@@ -45,9 +45,9 @@ defmodule WebsocketGateway.MongoDb.Service do
     {:ok, res.value["_id"] |> Utils.get_value_from_bson()}
   end
 
-  def remove_room_member(room_id, member) do
+  def remove_room_member(member_id) do
     @collection_room_members
-    |> Repository.delete(member |> Map.put(:room_id, room_id))
+    |> Repository.delete(%{_id: BSON.ObjectId.decode!(member_id)})
 
     :ok
   end
