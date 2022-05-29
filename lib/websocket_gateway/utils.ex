@@ -4,13 +4,19 @@ defmodule WebsocketGateway.Utils do
     for {key, val} <- map, into: %{}, do: {String.to_atom(key), val}
   end
 
-  def get_value_from_bson(bson) when is_list(bson) do
+  def bson_encode!(bson) when is_list(bson) do
     bson
     |> List.first()
     |> BSON.ObjectId.encode!()
   end
 
-  def get_value_from_bson(bson) do
+  def bson_encode!(bson) do
     bson |> BSON.ObjectId.encode!()
+  end
+
+  def retrieve_room_key(path) do
+    path
+    |> String.split("/")
+    |> List.last()
   end
 end

@@ -52,7 +52,7 @@ defmodule WebsocketGateway.Supervisor do
     ]
   end
 
-  defp port, do: Application.get_env(:websocket_gateway, :port, 4000)
+  defp port, do: Application.get_env(:websocket_gateway, :port, 8001)
 
   defp ip, do: Application.get_env(:websocket_gateway, :ip, {127, 0, 0, 1})
 

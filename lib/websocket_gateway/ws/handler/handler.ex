@@ -5,24 +5,32 @@ defmodule WebsocketGateway.Handler.Handler do
   alias WebsocketGateway.Handler.CommandHandler
   alias WebsocketGateway.Handler.MessageHandler
   alias WebsocketGateway.SyncParty.Service, as: SyncPartyService
+  alias WebsocketGateway.Utils
 
   def init(request, _state) do
-    session_info = SyncPartyService.get_session_info(request)
-
     state = %{
+      request: request,
       registry_key: request.path,
-      user: session_info,
-      room_key: retrieve_room_key(request)
+      room_key: Utils.retrieve_room_key(request.path)
     }
 
     {:cowboy_websocket, request, state}
   end
 
   def websocket_init(state) do
-    Websocket
-    |> Registry.register(state.registry_key, {})
+    session_info = SyncPartyService.get_session_info(state.request)
 
-    {:ok, state}
+    case session_info do
+      {:ok, info} ->
+        state = Map.put(state, :session, info)
+        Websocket |> Registry.register(state.registry_key, {})
+
+        {:ok, state}
+
+      {:error, message} ->
+        Logger.warning(message)
+        {:reply, {:close, 1000, message}, state}
+    end
   end
 
   def websocket_handle({:text, json}, state) do
@@ -47,11 +55,5 @@ defmodule WebsocketGateway.Handler.Handler do
   defp handle(%{"command" => command}, state) do
     Logger.debug("WS: Receive command: #{inspect(command)}. State: #{inspect(state)}")
     CommandHandler.handle(command, state)
-  end
-
-  defp retrieve_room_key(request) do
-    request.path
-    |> String.split("/")
-    |> List.last()
   end
 end

@@ -5,10 +5,10 @@ defmodule WebsocketGateway.Handler.MessageHandler do
   alias WebsocketGateway.MongoDb.Service, as: Storage
 
   def handle(%{"text" => text}, state) do
-    Storage.save_message(state.room_key, text, state.user)
+    Storage.save_message(state.room_key, text, state.session)
 
     message =
-      MessageConstructor.construct(text, state.user)
+      MessageConstructor.construct(text, state.session)
       |> Jason.encode!()
 
     Broker.send(message, state)

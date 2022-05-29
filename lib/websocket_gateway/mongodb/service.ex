@@ -42,7 +42,7 @@ defmodule WebsocketGateway.MongoDb.Service do
         true
       )
 
-    {:ok, res.value["_id"] |> Utils.get_value_from_bson()}
+    {:ok, res.value["_id"] |> Utils.bson_encode!()}
   end
 
   def remove_room_member(member_id) do

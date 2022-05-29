@@ -5,19 +5,19 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   alias WebsocketGateway.Constructor.MessageConstructor
   alias WebsocketGateway.MongoDb.Service, as: Storage
 
-  @join_room_command_pattern "nickname joined to the room"
-  @left_room_command_pattern "nickname left the room"
+  @join_room_command_pattern "{nickname} joined to the room"
+  @left_room_command_pattern "{nickname} left the room"
   @initial_message_sending_limit 50
 
   def handle(%{"text" => "Join" = cmd}, state) do
-    {:ok, member_id} = Storage.add_room_member(state.room_key, state.user)
+    {:ok, member_id} = Storage.add_room_member(state.room_key, state.session)
     state = add_member_id_to_state(state, member_id)
 
     send_chat_messages(state)
 
     join_message =
       @join_room_command_pattern
-      |> get_message_by_pattern(state.user.nickname)
+      |> get_message_by_pattern(state.session.nickname)
       |> CommandConstructor.construct(cmd, member_id)
       |> Jason.encode!()
 
@@ -27,17 +27,21 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   def handle(%{"text" => "Left" = cmd}, state) do
-    Storage.remove_room_member(state.user.id)
+    session = Map.get(state, :session, nil)
 
-    @left_room_command_pattern
-    |> get_message_by_pattern(state.user.nickname)
-    |> CommandConstructor.construct(cmd, state.user.id)
-    |> Jason.encode!()
-    |> Broker.send(state)
+    unless is_nil(session) do
+      Storage.remove_room_member(state.session.id)
+
+      @left_room_command_pattern
+      |> get_message_by_pattern(state.session.nickname)
+      |> CommandConstructor.construct(cmd, state.session.id)
+      |> Jason.encode!()
+      |> Broker.send(state)
+    end
   end
 
-  def handle(%{"text" => command}, state) do
-    Logger.warning("WS: Receive unhandled command: #{inspect(command)}")
+  def handle(%{"text" => cmd}, state) do
+    Logger.warning("WS: Receive unhandled command: #{inspect(cmd)}")
 
     {:ok, state}
   end
@@ -56,10 +60,10 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   end
 
   defp get_message_by_pattern(pattern, nickname) do
-    pattern |> String.replace("nickname", nickname, global: false)
+    pattern |> String.replace("{nickname}", nickname, global: false)
   end
 
   defp add_member_id_to_state(state, id) do
-    %{state | user: state.user |> Map.put(:id, id)}
+    %{state | session: state.session |> Map.put(:id, id)}
   end
 end
