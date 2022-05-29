@@ -10,7 +10,7 @@ defmodule WebsocketGateway.SyncParty.Service do
 
     case session_key do
       {:ok, key} ->
-        SyncPartyAPI.get_session_info(key)
+        SyncPartyAPI.get_session(key) |> add_session_key(key)
 
       :notfound ->
         message = "Session/Cookie: Session key not found | Cookie: #{cookie}"
@@ -27,4 +27,8 @@ defmodule WebsocketGateway.SyncParty.Service do
     message = "WS: Unexpected request: #{inspect(request)}"
     {:error, message}
   end
+
+  defp add_session_key({:ok, info}, key), do: {:ok, Map.put(info, :key, key)}
+
+  defp add_session_key({:error, _message} = error, _key), do: error
 end

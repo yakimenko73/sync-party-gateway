@@ -2,7 +2,7 @@ defmodule WebsocketGateway.Http.Client do
   require Logger
 
   def get(uri) do
-    Logger.debug("Http: GET #{uri}")
+    Logger.debug("HTTP: GET #{uri}")
     HTTPoison.get(uri) |> handle
   end
 
@@ -11,10 +11,10 @@ defmodule WebsocketGateway.Http.Client do
   end
 
   defp handle({:ok, %HTTPoison.Response{status_code: 404}}) do
-    {:error, "Http: Not found"}
+    {:error, "HTTP: Not found"}
   end
 
   defp handle({:error, %HTTPoison.Error{reason: reason}}) do
-    {:error, "Http: Unexpected error with reason: #{reason}"}
+    {:error, "HTTP: Unexpected error with reason: #{reason}"}
   end
 end
