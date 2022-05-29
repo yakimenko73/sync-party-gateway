@@ -1,0 +1,21 @@
+defmodule WebsocketGateway.SyncParty.API do
+  alias WebsocketGateway.Http.Client, as: HttpClient
+  alias WebsocketGateway.Utils
+  require Logger
+
+  @sessions_api "http://127.0.0.1:8000/api/sessions"
+
+  def get_session_info(session_key) do
+    HttpClient.get("#{@sessions_api}/#{session_key}/") |> handle_session_info(session_key)
+  end
+
+  defp handle_session_info({:ok, body}, session_key) do
+    Logger.debug("Session: #{session_key} | Info: #{body}")
+    {:ok, body |> Jason.decode!() |> Utils.to_atom_keys()}
+  end
+
+  defp handle_session_info({:error, message}, session_key) do
+    message = "HTTP: #{message} | SessionId: #{session_key}"
+    {:error, message}
+  end
+end
