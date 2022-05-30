@@ -30,5 +30,5 @@ defmodule WebsocketGateway.SyncParty.Service do
 
   defp add_session_key({:ok, info}, key), do: {:ok, Map.put(info, :key, key)}
 
-  defp add_session_key({:error, _message} = error, _key), do: error
+  defp add_session_key({:error, message}, _key), do: {:error, {:api, message}}
 end

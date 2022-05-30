@@ -1,6 +1,8 @@
 defmodule WebsocketGateway.Handler.Handler do
   @behaviour :cowboy_websocket
   require Logger
+  require WebsocketGateway.Error.Constants
+  alias WebsocketGateway.Error.Constants, as: ErrorConst
   alias Registry.WebsocketGateway, as: Websocket
   alias WebsocketGateway.Handler.CommandHandler
   alias WebsocketGateway.Handler.MessageHandler
@@ -29,7 +31,11 @@ defmodule WebsocketGateway.Handler.Handler do
 
       {:error, message} ->
         Logger.warning(message)
-        {:reply, {:close, 1000, message}, state}
+
+        case message do
+          {:api, _message} -> {:reply, {:close, 1011, ErrorConst.server_internal_error}, state}
+          _ -> {:reply, {:close, 1000, ErrorConst.cookie_error}, state}
+        end
     end
   end
 

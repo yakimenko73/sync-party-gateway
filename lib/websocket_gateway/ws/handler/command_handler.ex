@@ -1,5 +1,7 @@
 defmodule WebsocketGateway.Handler.CommandHandler do
   require Logger
+  require WebsocketGateway.Error.Constants
+  alias WebsocketGateway.Error.Constants, as: ErrorConst
   alias WebsocketGateway.Broker
   alias WebsocketGateway.Constructor.CommandConstructor
   alias WebsocketGateway.Constructor.MessageConstructor
@@ -29,12 +31,11 @@ defmodule WebsocketGateway.Handler.CommandHandler do
         {:reply, {:text, join_message}, state}
 
       {:updated, member_id} ->
-        message = "WS: User #{member_id} already in #{state.room_key} room"
-        Logger.warning(message)
+        Logger.warning("WS: User #{member_id} already in #{state.room_key} room")
 
         state = Map.delete(state, :session)
-        
-        {:reply, {:close, 1000, message}, state}
+
+        {:reply, {:close, 1000, ErrorConst.already_in_room_error}, state}
     end
   end
 
