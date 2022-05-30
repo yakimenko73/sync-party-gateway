@@ -1,7 +1,6 @@
 defmodule WebsocketGateway.MongoDb.Service do
   alias WebsocketGateway.MongoDb.Repository
   alias WebsocketGateway.Utils
-  require Logger
 
   @collection_chat_messages "chatmessages"
   @collection_room_members "roommembers"
@@ -32,17 +31,15 @@ defmodule WebsocketGateway.MongoDb.Service do
   def add_room_member(room_id, member) do
     body = member |> Map.put(:room_id, room_id)
 
-    {:ok, res} =
-      @collection_room_members
-      |> Repository.find_one_and_update(
-        body,
-        %{
-          "$set" => Map.put(body, :date, DateTime.utc_now())
-        },
-        true
-      )
-
-    {:ok, res.value["_id"] |> Utils.bson_encode!()}
+    @collection_room_members
+    |> Repository.find_one_and_update(
+      body,
+      %{
+        "$set" => Map.put(body, :date, DateTime.utc_now())
+      },
+      true
+    )
+    |> handle_updated_result()
   end
 
   def remove_room_member(member_id) do
@@ -51,4 +48,10 @@ defmodule WebsocketGateway.MongoDb.Service do
 
     :ok
   end
+
+  defp handle_updated_result({:ok, %Mongo.FindAndModifyResult{updated_existing: true} = res}),
+    do: {:updated, res.value["_id"] |> Utils.bson_encode!()}
+
+  defp handle_updated_result({:ok, %Mongo.FindAndModifyResult{updated_existing: false} = res}),
+    do: {:ok, res.value["_id"] |> Utils.bson_encode!()}
 end

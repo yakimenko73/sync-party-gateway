@@ -10,26 +10,36 @@ defmodule WebsocketGateway.Handler.CommandHandler do
   @initial_message_sending_limit 50
 
   def handle(%{"text" => "Join" = cmd}, state) do
-    {:ok, member_id} = Storage.add_room_member(state.room_key, state.session)
-    state = add_member_id_to_state(state, member_id)
+    res = Storage.add_room_member(state.room_key, state.session)
 
-    send_chat_messages(state)
+    case res do
+      {:ok, member_id} ->
+        state = add_member_id_to_state(state, member_id)
 
-    join_message =
-      @join_room_command_pattern
-      |> get_message_by_pattern(state.session.nickname)
-      |> CommandConstructor.construct(cmd, member_id)
-      |> Jason.encode!()
+        send_chat_messages(state)
 
-    Broker.send(join_message, state)
+        join_message =
+          @join_room_command_pattern
+          |> get_message_by_pattern(state.session.nickname)
+          |> CommandConstructor.construct(cmd, member_id)
+          |> Jason.encode!()
 
-    {:reply, {:text, join_message}, state}
+        Broker.send(join_message, state)
+
+        {:reply, {:text, join_message}, state}
+
+      {:updated, member_id} ->
+        message = "WS: User #{member_id} already in #{state.room_key} room"
+        Logger.warning(message)
+
+        state = Map.delete(state, :session)
+        
+        {:reply, {:close, 1000, message}, state}
+    end
   end
 
   def handle(%{"text" => "Left" = cmd}, state) do
-    session = Map.get(state, :session, nil)
-
-    unless is_nil(session) do
+    if Map.has_key?(state, :session) do
       Storage.remove_room_member(state.session.id)
 
       @left_room_command_pattern
