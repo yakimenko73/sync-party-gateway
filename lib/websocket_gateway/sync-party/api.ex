@@ -1,4 +1,4 @@
-defmodule WebsocketGateway.SyncParty.API do
+defmodule WebsocketGateway.SyncParty.Api do
   alias WebsocketGateway.Http.Client, as: HttpClient
   alias WebsocketGateway.Utils
   require Logger

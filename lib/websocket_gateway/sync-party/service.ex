@@ -1,6 +1,6 @@
 defmodule WebsocketGateway.SyncParty.Service do
   alias WebsocketGateway.Http.Cookie
-  alias WebsocketGateway.SyncParty.API, as: SyncPartyAPI
+  alias WebsocketGateway.SyncParty.Api, as: SyncPartyApi
   require Logger
 
   @session_key_cookie_name "sessionid"
@@ -10,7 +10,7 @@ defmodule WebsocketGateway.SyncParty.Service do
 
     case session_key do
       {:ok, key} ->
-        SyncPartyAPI.get_session(key) |> add_session_key(key)
+        SyncPartyApi.get_session(key) |> add_session_key(key)
 
       :notfound ->
         message = "Session/Cookie: Session key not found | Cookie: #{cookie}"
