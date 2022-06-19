@@ -30,7 +30,7 @@ defmodule WebsocketGateway.Handler.Handler do
         {:ok, state}
 
       {:error, message} ->
-        Logger.warning(message)
+        Logger.error(inspect(message))
 
         case message do
           {:api, _message} -> {:reply, {:close, 1011, ErrorConst.server_internal_error}, state}

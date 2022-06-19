@@ -2,7 +2,7 @@ defmodule WebsocketGatewayTest do
   use ExUnit.Case
   doctest WebsocketGateway
 
-  test "greets the world" do
-    assert WebsocketGateway.hello() == :world
+  test "Context is load" do
+    assert WebsocketGateway.context() == :loaded
   end
 end

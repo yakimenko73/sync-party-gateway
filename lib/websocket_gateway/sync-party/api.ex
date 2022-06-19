@@ -3,7 +3,7 @@ defmodule WebsocketGateway.SyncParty.Api do
   alias WebsocketGateway.Utils
   require Logger
 
-  @sessions_api "http://127.0.0.1:8000/api/sessions"
+  @sessions_api "http://localhost:8000/api/sessions"
 
   def get_session(session_key) do
     HttpClient.get("#{@sessions_api}/#{session_key}/") |> handle(session_key)

@@ -1,40 +1,40 @@
-defmodule WebsocketGateway.Supervisor do
-  def init() do
-    import Supervisor.Spec
+defmodule WebsocketGateway.Application do
+  use Application
+  require Logger
 
-    children = [
-      Plug.Cowboy.child_spec(
-        scheme: :http,
-        plug: WebsocketGateway.Router,
-        options: [
-          dispatch: dispatch(),
-          port: port(),
-          ip: ip()
-        ]
-      ),
-      Registry.child_spec(
-        keys: :duplicate,
-        name: Registry.WebsocketGateway
-      ),
-      worker(
+  def start(_type, _args) do
+    Supervisor.start_link(children(), opts())
+  end
+
+  defp children() do
+    [
+      {Plug.Cowboy,
+       scheme: :http,
+       plug: WebsocketGateway.Router,
+       options: [
+         dispatch: dispatch(),
+         port: port(),
+         ip: ip()
+       ]},
+      {Registry, keys: :duplicate, name: Registry.WebsocketGateway},
+      {
         Mongo,
         [
-          [
-            name: :mongo,
-            database: db_name(),
-            pool_size: 3,
-            hostname: db_hostname(),
-            port: db_port(),
-            username: db_username(),
-            password: db_password(),
-            auth_source: db_name()
-          ]
+          name: :mongo,
+          database: db_name(),
+          pool_size: 3,
+          hostname: db_hostname(),
+          port: db_port(),
+          username: db_username(),
+          password: db_password(),
+          auth_source: db_name()
         ]
-      )
+      }
     ]
+  end
 
-    opts = [strategy: :one_for_one, name: WebsocketGateway.Supervisor]
-    Supervisor.start_link(children, opts)
+  defp opts() do
+    [strategy: :one_for_one, name: WebsocketGateway.Supervisor]
   end
 
   defp dispatch() do
