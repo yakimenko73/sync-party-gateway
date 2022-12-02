@@ -1,4 +1,4 @@
-# <p align="center">Sync-party server app</p>
+# <p align="center">Sync-party gateway</p>
 
 [![Pray for Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://stand-with-ukraine.pp.ua)
 [![Licence](https://img.shields.io/github/license/yakimenko73/sync-party-gateway)](https://github.com/yakimenko73/sync-party-gateway/blob/master/LICENSE)
