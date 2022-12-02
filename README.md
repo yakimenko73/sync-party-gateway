@@ -1,6 +1,10 @@
-[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+# <p align="center">Sync-party server app</p>
 
-# Sync-party Websocket Gateway
+[![Pray for Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://stand-with-ukraine.pp.ua)
+[![Licence](https://img.shields.io/github/license/yakimenko73/sync-party-gateway)](https://github.com/yakimenko73/sync-party-gateway/blob/master/LICENSE)
+[![Deploy](https://github.com/yakimenko73/sync-party-gateway/actions/workflows/docker-image.yml/badge.svg)](https://github.com/yakimenko73/sync-party-gateway/actions/workflows/docker-image.yml)
+[![Code factor](https://www.codefactor.io/repository/github/yakimenko73/sync-party-gateway/badge)](https://www.codefactor.io/repository/github/yakimenko73/sync-party-gateway)
+
 ## What is it?
 Elixir websocket gateway for real-time Sync-party site operation
 
